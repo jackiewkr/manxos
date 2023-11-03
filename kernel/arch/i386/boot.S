@@ -15,6 +15,12 @@
 # Reserve a stack for the initial thread.
 .section .bss
 .align 16
+# Reserve 1 page for page directory
+page_directory:
+.skip 4096
+# Reserve 1 page for a page table
+page_table1:
+.skip 4096
 stack_bottom:
 .skip 16384 # 16 KiB
 stack_top:
@@ -24,6 +30,16 @@ stack_top:
 .global _start
 .type _start, @function
 _start:
+        # Set page dir to %ecx
+        movl $page_directory, %ecx
+        movl %ecx, %cr3
+
+        # enable paging bit
+        movl %cr0, %ecx
+        orl 0x80000001, %ecx
+        movl %ecx, %cr0
+
+        # Move to stack top and setup kernel
 	movl $stack_top, %esp
 
 	# Call the global constructors.
