@@ -12,17 +12,28 @@
 .long FLAGS
 .long CHECKSUM
 
-# Reserve a stack for the initial thread.
+# Reserve memory space
 .section .bss
 .align 16
+# Reserve space for GDT
+gdt:
+gdt_null:
+.zero 8 # null descriptor 8 bytes
+gdt_code:
+# code segment
+gdt_data:
+.skip 8 # data segment
+gdt_end:
+
 # Reserve 1 page for page directory
 page_directory:
 .skip 4096
 # Reserve 1 page for a page table
 page_table1:
 .skip 4096
+# Reserve 16 KiB for stack
 stack_bottom:
-.skip 16384 # 16 KiB
+.skip 16384
 stack_top:
 
 # The kernel entry point.
